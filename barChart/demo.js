@@ -1,5 +1,8 @@
 var body = d3.select("body");
 
+var numOfClickedBars = 0;
+var selectedBarId = [];
+
 var width = 400;
 var height = 400;
 
@@ -35,25 +38,54 @@ var rects = svg.selectAll(".MyRect")
 		.enter()
 		.append("rect")
 		.attr("class","MyRect")
+		.attr("clicked", "false")
+		.attr("id", function (d,i){
+			return "component" + (i + 1);
+		})
 		.attr("transform","translate(" + padding.left + "," + padding.top + ")")
+		/*
 		.on("mouseover",function(d,i){
 			d3.select(this)
 				.attr("fill","red");
 		})
+		*/
+		.on("click",function(d,i){
+			var clicked = this.getAttribute("clicked");
+			var id = this.getAttribute("id");
+
+			if (numOfClickedBars < 2) {
+				if (clicked === "false") {
+					d3.select(this)
+						.attr("clicked", "true")
+						.attr("fill", "red");
+					numOfClickedBars = numOfClickedBars + 1;
+					selectedBarId.push(id);
+				}
+
+				if (numOfClickedBars === 2) {
+					console.log(numOfClickedBars);
+				}
+			} else {
+				alert("Two components are chosen, please reset")
+			}
+		})
+		/*
 		.on("mouseout",function(d,i){
 			d3.select(this)
 				.transition()
 		        .duration(500)
 				.attr("fill","steelblue");
 		})
+		*/
 		.attr("x",function(d,i){
 			return xScale(i) + rectPadding/2;
 		})
 		.attr("width", xScale.rangeBand() - rectPadding)
 		.attr("y", function(d){
-			var min = yScale.domain()[0];
-			return yScale(min);
+			//var min = yScale.domain()[0];
+			return yScale(d);
 		})
+		/*
 		.attr("height", function(d){
 			return 0;
 		})
@@ -66,12 +98,13 @@ var rects = svg.selectAll(".MyRect")
 		.attr("y",function(d){
 			return yScale(d);
 		})
+		*/
 		.attr("height", function(d){
 			return height - padding.top - padding.bottom - yScale(d);
 		})
 		.attr("fill","steelblue");
-		
 
+/*
 var texts = svg.selectAll(".MyText")
         .data(dataset)
         .enter()
@@ -106,7 +139,7 @@ var texts = svg.selectAll(".MyText")
         .attr("y",function(d){
         	return yScale(d);
         });
-
+*/
 svg.append("g")
 	.attr("class","axis")
 	.attr("transform","translate(" + padding.left + "," + (height - padding.bottom) + ")")
@@ -116,6 +149,3 @@ svg.append("g")
 	.attr("class","axis")
 	.attr("transform","translate(" + padding.left + "," + padding.top + ")")
 	.call(yAxis);
-
-
-
